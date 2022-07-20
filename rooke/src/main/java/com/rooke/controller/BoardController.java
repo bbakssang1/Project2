@@ -1,5 +1,6 @@
 package com.rooke.controller;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
@@ -50,5 +51,13 @@ public class BoardController {
 
 
     return "redirect:/board/list.do";
+  }
+
+  @GetMapping(value = "/board/list.do")
+  public String openBoardList(Model model) {
+    List<RookeDTO> boardList = boardService.getBoardList();
+    model.addAttribute("boardList", boardList);
+
+    return "board/list";
   }
 }
