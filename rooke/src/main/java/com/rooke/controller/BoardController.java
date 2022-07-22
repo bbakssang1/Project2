@@ -60,4 +60,21 @@ public class BoardController {
 
     return "board/list";
   }
+
+  @GetMapping(value = "/board/view.do")
+  public String openBoardDetail(@RequestParam(value = "idx", required = false) Long idx,
+      Model model) {
+    if (idx == null) {
+      // todo=>잘못된 접근 메시지, 다시 게시글 리스트로
+      return "redirect:/board/list.do";
+    }
+    RookeDTO rooke = boardService.getBoardDetail(idx);
+    if (rooke == null || "Y".equals(rooke.getDeleteYn())) {
+      // todo 존재치 않는 게시글이나 이미 삭제된 게시글이면 다시 게시글 리스트로
+      return "redirect:/board/list.do";
+    }
+    model.addAttribute("rooke", rooke);
+    return "board/view";
+
+  }
 }
