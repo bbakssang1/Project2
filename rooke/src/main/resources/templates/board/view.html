@@ -91,4 +91,27 @@
 		
 		</div>
 	</th:block>
+	
+	
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+		
+		function deleteBoard(idx){
+			if(confirm(idx+"번 게시글을 정말 삭제합니까?")){
+				var uri=[[@{/board/delete.do}]];
+				var html="";
+				
+				html += '<form name="dataForm" action="'+uri+'" method="post">';
+				html += '<input type="hidden" name="idx" value="'+idx+'">';
+				html += '</form>';
+				
+				$("body").append(html);
+				document.dataForm.submit();
+			}
+		}
+		
+		
+		</script>
+	</th:block>
+	
 </html>
