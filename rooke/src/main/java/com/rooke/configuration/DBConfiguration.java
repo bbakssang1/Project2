@@ -15,10 +15,13 @@ import org.springframework.context.annotation.PropertySource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+// 콘피규레이션이 지정된 클래스를 자바 기반의 설정파일로 인식
 @Configuration
+// 해당클래스에서 참조할 프로퍼티스 파일의 위치 지정
 @PropertySource("classpath:/application.properties")
 public class DBConfiguration {
 
+  // 빈으로 등록된 인스턴스(객체)를 클래스에 주입하는 데 사용한다
   @Autowired
   private ApplicationContext applicationContext;
 
