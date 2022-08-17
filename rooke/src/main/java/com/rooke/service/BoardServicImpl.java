@@ -1,11 +1,13 @@
 package com.rooke.service;
 
-import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.rooke.domain.RookeDTO;
+import com.rooke.domain.SearchDto;
 import com.rooke.mapper.RookeMapper;
+import com.rooke.paging.Pagination;
+import com.rooke.paging.PagingResponse;
 
 @Service
 public class BoardServicImpl implements BoardService {
@@ -23,6 +25,7 @@ public class BoardServicImpl implements BoardService {
     } else {
       queryResult = rookeMapper.updateBoard(dto);
     }
+
 
     return (queryResult == 1) ? true : false;
   }
@@ -44,14 +47,24 @@ public class BoardServicImpl implements BoardService {
   }
 
   @Override
-  public List<RookeDTO> getBoardList() {
-    List<RookeDTO> boardList = Collections.emptyList();
-    int boardTotalCount = rookeMapper.selectBoardTotalCount();
+  public PagingResponse<RookeDTO> getBoardList(final SearchDto search) {
+    int boardTotalCount = rookeMapper.selectBoardTotalCount(search);
+    Pagination pagination = new Pagination(boardTotalCount, search);
+    search.setPagination(pagination);
 
-    if (boardTotalCount > 0) {
-      boardList = rookeMapper.selectBoardList();
-    }
+    List<RookeDTO> list = rookeMapper.selectBoardList(search);
+    return new PagingResponse<>(list, pagination);
 
-    return boardList;
   }
+  // @Override
+  // public List<RookeDTO> getBoardList(final SearchDto search) {
+  // List<RookeDTO> boardList = Collections.emptyList();
+  // int boardTotalCount = rookeMapper.selectBoardTotalCount(search);
+  //
+  // if (boardTotalCount > 0) {
+  // boardList = rookeMapper.selectBoardList(search);
+  // }
+  //
+  // return boardList;
+  // }
 }

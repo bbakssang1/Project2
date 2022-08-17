@@ -1,14 +1,16 @@
 package com.rooke.controller;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.rooke.domain.RookeDTO;
+import com.rooke.domain.SearchDto;
+import com.rooke.paging.PagingResponse;
 import com.rooke.service.BoardService;
 import constant.Method;
 import util.UiUtils;
@@ -56,8 +58,8 @@ public class BoardController extends UiUtils {
   }
 
   @GetMapping(value = "/board/list.do")
-  public String openBoardList(Model model) {
-    List<RookeDTO> boardList = boardService.getBoardList();
+  public String openBoardList(@ModelAttribute("search") final SearchDto search, Model model) {
+    PagingResponse<RookeDTO> boardList = boardService.getBoardList(search);
     model.addAttribute("boardList", boardList);
 
     return "board/list";

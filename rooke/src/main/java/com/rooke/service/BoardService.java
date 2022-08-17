@@ -1,7 +1,8 @@
 package com.rooke.service;
 
-import java.util.List;
 import com.rooke.domain.RookeDTO;
+import com.rooke.domain.SearchDto;
+import com.rooke.paging.PagingResponse;
 
 public interface BoardService {
 
@@ -11,5 +12,5 @@ public interface BoardService {
 
   public boolean deleteBoard(Long idx);
 
-  public List<RookeDTO> getBoardList();
+  public PagingResponse<RookeDTO> getBoardList(SearchDto search);
 }

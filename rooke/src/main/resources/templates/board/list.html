@@ -25,19 +25,8 @@
 						<th>조회수</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr th:if="${not #lists.isEmpty(boardList)}" th:each="row:${boardList}">
-						<td scope="row" th:text="${#strings.equals(row.noticeYn,'Y')?'공지':row.idx}"></td>
-						<td class="text-left">
-							<a th:href="@{/board/view.do(idx=${row.idx})}" th:text="${row.title}"></a>
-						</td>
-						<td th:text="${row.writer}"></td>
-						<td th:text="${#temporals.format(row.insertTime,'yyyy-MM-dd')}"></td>
-						<td th:text="${row.viewCnt}"></td>
-					</tr>
-					<tr th:unless="${not #lists.isEmpty(boardList)}">
-						<td colspan="5">조회된 결과가 없어요!</td>
-					</tr>
+				<tbody id=list>
+					
 				</tbody>
 			</table>	
 			<div class="btn_wrap text-right"> 
@@ -46,24 +35,101 @@
 			<th:block layout:fragment="paging">
 				<nav aria-label="Page navigation" class="text-center">
 					<ul class="pagination">
-						<li>
-						 	<a href="#" aria-label="Previous">
-						 		<span aria-hidden="true">&laquo;</span>
-						 	</a>
-						</li>
-						<li><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li><a href="#">4</a></li>
-						<li><a href="#">5</a></li>
-						<li>
-							<a href="#" aria-label="Next">
-								<span aria-hidden="true">&raquo;</span>
-							</a>
-						</li>
+						
+						
 					</ul>
 				</nav>
 			</th:block>
 		</div>
+	</th:block>
+	
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			window.onload=()=>{
+				getBoardList();
+			}
+			
+			//게시글 리스트 조회
+			function getBoardList(){
+				const list=[[${boardList.list}]];
+				if(!list.length){
+					document.getElementById('list').innerHTML='<td colspan="5">검색된 결과가 없습니다</td>';
+					drawPage();
+					return false;
+					
+				}
+				
+				const pagination=[[${boardList.pagination}]];
+				const search=[[${search}]];
+				let num=pagination.totalRecordCount-((search.page-1)*search.recordSize);
+				drawList(list,num);
+				drawPage(pagination,search);
+			}
+			
+			//리스트 HTML draw
+			function drawList(list,num){
+				let html='';
+				list.forEach(obj => {
+					html +=`
+					<tr>
+						<td>${obj.noticeYn===true?'공지':num--}</td>
+						<td class="text-left"><a href="/board/view.do?idx=${obj.idx}">${obj.title}</a></td>
+						<td>${obj.writer}</td>
+						<td>${obj.insertTime}</td>
+						<td>${obj.viewCnt}</td>
+					</tr>
+					`;
+				})
+				document.getElementById('list').innerHTML=html;
+			}
+			
+			//페이지 HTML draw
+			function drawPage(pagination,search){
+				if(!pagination||!search){
+					document.querySelector('.pagination').innerHTML='';
+					return false;
+				}
+				let html='';
+				
+				
+				//첫 페이지 , 이전 페이지
+				if(pagination.existPrevPage){
+					html+=`
+						<li><a href="javascript:void(0)" onclick="movePage(1);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+						<li><a href="javascript:void(0)" onclick="movePage(${pagination.startPage - 1});" aria-label="Previous"><span aria-hidden="true">&lsaquo;</span></a></li>
+					`;
+				}
+				//페이지 번호
+				for(let i=pagination.startPage; i<=pagination.endPage; i++){
+					const active=(i===search.page)?'class="active"':'';
+					html+=`
+						<li ${active}><a href="javascript:void(0)" onclick="movePage(${i})">${i}</a></li>`;
+				}
+				
+				 // 다음 페이지, 마지막 페이지
+                if (pagination.existNextPage) {
+                    html += `
+                        <li><a href="javascript:void(0)" onclick="movePage(${pagination.endPage + 1});" aria-label="Next"><span aria-hidden="true">&rsaquo;</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="movePage(${pagination.totalPageCount});" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                    `;
+                }
+
+                document.querySelector('.pagination').innerHTML = html;
+            }
+
+
+            // 페이지 이동
+            function movePage(page) {
+                const queryParams = {
+                    page: (page) ? page : 1,
+                    recordSize: 10,
+                    pageSize: 5
+                }
+                location.href = location.pathname + '?' + new URLSearchParams(queryParams).toString();
+            }
+
+				
+			
+		</script>
 	</th:block>
 </html>

@@ -39,14 +39,16 @@
 		where idx=#{idx}
 	</update>
 	<!-- 목록 -->
-	<select id="selectBoardList" parameterType="RookeDTO" resultType="RookeDTO">
+	<select id="selectBoardList" parameterType="SearchDto" resultType="RookeDTO">
 		select <include refid="rookeColumns" />
 		from tb_board
 		where delete_yn='N'
-		order by notice_yn asc,idx desc,insert_time desc
+		order by idx desc
+		limit #{pagination.limitStart},#{recordSize}
+		<!--order by notice_yn asc,idx desc,insert_time desc  -->	
 	</select>
 	<!-- 총 게시글 -->
-	<select id="selectBoardTotalCount" parameterType="RookeDTO" resultType="int">
+	<select id="selectBoardTotalCount" parameterType="SearchDto" resultType="int">
 		select count(*) from tb_board where delete_yn='N'
 	</select>
 </mapper>

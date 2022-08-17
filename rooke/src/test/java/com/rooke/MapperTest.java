@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rooke.domain.RookeDTO;
+import com.rooke.domain.SearchDto;
 import com.rooke.mapper.RookeMapper;
 
 @SpringBootTest
@@ -98,10 +99,10 @@ public class MapperTest {
   }
 
   @Test
-  public void testSelectList() {
-    int boardCount = rookeMapper.selectBoardTotalCount();
+  public void testSelectList(final SearchDto search) {
+    int boardCount = rookeMapper.selectBoardTotalCount(search);
     if (boardCount > 0) {
-      List<RookeDTO> rookeList = rookeMapper.selectBoardList();
+      List<RookeDTO> rookeList = rookeMapper.selectBoardList(search);
       if (CollectionUtils.isEmpty(rookeList) == false) {
         for (RookeDTO dto : rookeList) {
           System.out.println("-------------------------------");
