@@ -1,5 +1,6 @@
 package com.rooke.controller;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
@@ -83,7 +84,8 @@ public class BoardController extends UiUtils {
   }
 
   @PostMapping(value = "/board/delete.do")
-  public String deleteBoard(@RequestParam(value = "idx", required = false) Long idx, Model model) {
+  public String deleteBoard(@RequestParam(value = "idx", required = false) Long idx,
+      @RequestParam final Map<String, Object> queryParams, Model model) {
     if (idx == null) {
       return showMessageWithRedirect("잘못된 접근입니다", "/board/list.do", Method.GET, null, model);
     }
@@ -99,6 +101,7 @@ public class BoardController extends UiUtils {
       return showMessageWithRedirect("시스템에 문제 발생! 운영자에게 문의하세요!", "/board/list.do", Method.GET, null,
           model);
     }
-    return showMessageWithRedirect("게시글이 삭제됐습니다!", "/board/list.do", Method.GET, null, model);
+    return showMessageWithRedirect("게시글이 삭제됐습니다!", "/board/list.do", Method.GET, queryParams,
+        model);
   }
 }

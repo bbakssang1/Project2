@@ -42,13 +42,45 @@
 	<select id="selectBoardList" parameterType="SearchDto" resultType="RookeDTO">
 		select <include refid="rookeColumns" />
 		from tb_board
-		where delete_yn='N'
+		where delete_yn='N'<include refid="search"></include>
 		order by idx desc
 		limit #{pagination.limitStart},#{recordSize}
 		<!--order by notice_yn asc,idx desc,insert_time desc  -->	
 	</select>
 	<!-- 총 게시글 -->
 	<select id="selectBoardTotalCount" parameterType="SearchDto" resultType="int">
-		select count(*) from tb_board where delete_yn='N'
+		select count(*) from tb_board where delete_yn='N'<include refid="search"></include>
 	</select>
+	<!-- 게시글 검색 -->
+	<sql id="search">
+		<!-- 검색키워드가 있을때 -->
+		<if test="keyword !=null and keyword !=''">
+			<choose>
+			<!-- 검색 유형 있을 때 -->
+			<when test="searchType !=null and searchType !=''">
+				<choose>
+					<when test="'title'.equals( searchType )">
+						and title like concat('%',#{keyword},'%')
+					</when>
+					<when test="'content'.equals( searchType )">
+						and content like concat('%',#{keyword},'%')
+					</when>
+					<when test="'writer'.equals( searchType )">
+						and writer like concat('%',#{keyword},'%')
+					</when>
+				
+			</choose>
+			</when>
+		<!-- 전체 검색일 때 -->
+		<otherwise>
+			and (title like concat('%',#{keyword},'%') or 
+			content like concat('%',#{keyword},'%') or 
+			writer like concat('%',#{keyword},'%')
+			
+			)
+			
+		</otherwise>
+		</choose>
+		</if>
+	</sql>
 </mapper>

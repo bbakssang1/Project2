@@ -13,7 +13,7 @@ public class SearchDto {
   private int pageSize; // 화면 하단에 출력할 페이지수
 
   private String keyword; // 검색 키워드
-  private String seachType; // 검색 유형
+  private String searchType; // 검색 유형
   private Pagination pagination; // 페이징 처리
 
   public SearchDto() {
