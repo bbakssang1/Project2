@@ -44,8 +44,8 @@
 			</form>
 			<div class="btn_wrap text-center">
 				<!--  <a th:href="@{/board/list.do}" class="btn btn-default waves-effect waves-light">이전으로</a>-->
-				<a href="javascript:void(0);" onclick="goListPage();" class="btn btn-default waves-effect waves-light">이전으로</a>
 				<!-- <a th:href="@{/board/write.do(idx=${rooke.idx})}" class="btn btn-primary waves-effect waves-light">수정</a>-->
+				<a href="javascript:void(0);" onclick="goListPage();" class="btn btn-default waves-effect waves-light">이전으로</a>
 				<a href="javascript:void(0);" onclick="goWritePage();" class="btn btn-primary waves-effect waves-light">수정</a>
 				<button type="button" class="btn btn-danger waves-effect waves-light" th:onclick="deleteBoard([[${rooke.idx}]])">삭제</button>
 			</div>
@@ -60,7 +60,7 @@
 				</div>
 			<form class="form-horizontal form-view">
 				<div class="input-group margin-bottom-20">
-				<input type="email" class="form-control" placeholder="">
+				<input type="email" class="form-control" placeholder="댓글을 입력하세요">
 				<div class="input-group-btn">
 					<button type="button" class="btn waves-effect waves-light">
 						<i class="fa fa-commenting" aria-hidden="true"></i>
@@ -69,22 +69,6 @@
 				</div>
 				
 				<ul class="notice-list">
-					<li>
-						<span class="name">운영자</span>
-						<span class="desc">새로운 공지입니다</span>
-						<span class="time">2022.07.22</span>
-						<button type="button" class="btn btn-xs btn-circle">
-							<i class="fa fa-close" aria-hidden="true"></i>	
-						</button>
-					</li>
-					<li>
-						<span class="name">관리자-1</span>
-						<span class="desc">이벤트 공지입니다</span>
-						<span class="time">2022.11.25</span>
-						<button type="button" class="btn btn-xs btn-circle">
-							<i class="fa fa-close" aria-hidden="true"></i>	
-						</button>
-					</li>
 					
 				</ul>
 				
@@ -105,10 +89,13 @@
 			location.href='/board/list.do'+'?'+queryString.toString();
 		}
 		
+		
 		//게시글 수정 페이지로 이동
 		function goWritePage(){
 			location.href='/board/write.do'+location.search;
 		}
+		
+		
 		//게시글 삭제
 		function deleteBoard(){
 			const idx=[[${rooke.idx}]];
@@ -132,6 +119,34 @@
 			const form=doc.body.firstChild;
 			document.body.append(form);
 			document.getElementById('deleteForm').submit();
+		}
+		
+		
+		//댓글
+		$(function(){
+			printCommentList();
+		});
+		
+		function printCommentList(){
+			var uri=[[@{/comments/}+${rooke.idx}]];
+			$.get(uri,function(response){
+				if(isEmpty(response)==false){
+					var commentHtml="";
+					
+					$(response.commentList).each(function(idx,comment){
+						commentHtml+=`	
+							<li>
+								<span class="name">${comment.writer}</span>
+								<span class="desc">${comment.content}</span>
+								<span class="time">${moment(comment.insertTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+								<button type="button" class="btn btn-xs btn-circle"><i class="fa fa-close" aria-hidden="true"></i></button>
+							</li>
+						`;
+					});
+					
+					$(".notice-list").html(commentHtml);
+				}
+			},"json");
 			
 		}
 		

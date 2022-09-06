@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rooke.mapper.CommentMapper">
+	<sql id="commentColumns">
+		idx,
+		board_idx,
+		content,
+		writer,
+		delete_yn,
+		insert_time,
+		update_time,
+		delete_time
+	</sql>
+	
+	<insert id="insertComment" parameterType="CommentDTO">
+		insert into tb_comment(
+			<include refid="commentColumns"></include>
+		) values (#{idx},#{boardIdx},#{content},#{writer},ifnull(#{deleteYn},'N'),now(),null,null)
+		
+	</insert>
+	
+	<select id="commentDetail" parameterType="long" resultType="CommentDTO">
+		select <include refid="commentColumns"></include>
+		from tb_comment
+		where delete_yn='N'
+		and idx=#{idx}
+	</select>
+	
+	<update id="updateComment">
+		update tb_comment
+		set update_time=now(),
+		content=#{content},
+		writer=#{writer}
+		where idx=#{idx}
+	</update>
+	
+	<update id="deleteComment">
+		update tb_comment
+		set delete_yn='Y',
+		delete_time=now()
+		where idx=#{idx}
+	</update>
+	
+	<select id="commentList" parameterType="CommentDTO" resultType="CommentDTO">
+		select <include refid="commentColumns"></include>
+		from tb_comment
+		where delete_yn='N'
+		and board_idx=#{boardIdx}
+		order by idx desc, insert_time desc
+	</select>
+	
+	<select id="commentTotalCount" parameterType="CommentDTO" resultType="int">
+		select count(*)
+		from tb_comment
+		where delete_yn='N'
+		and board_idx=#{boardIdx}
+	</select>
+</mapper>
