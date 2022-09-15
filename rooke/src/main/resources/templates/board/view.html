@@ -177,7 +177,7 @@
 			
 			var uri=[[@{/comments}]];
 			var headers={"Content-Type":"application/json","X-HTTP-Method-Override":"POST"};
-			var dtos={"boardIdx":boardIdx,"content":content.value,"writer":"관리자"};
+			var dtos={"boardIdx":boardIdx,"content":content.value,"writer":"방문객"};
 			
 			$.ajax({
 				url:uri,
@@ -231,7 +231,39 @@
 				}
 			});		
 		
-		}		
+		}	
+		
+		//댓글삭제
+		function deleteComment(idx){
+			if(!confirm('댓글을 삭제합니까?')){
+				return false;
+			}
+			
+			var uri=[[@{/comments/}]]+idx;
+			var headers={"Content-Type":"application/json","X_HTTP+Method-Override":"DELETE"};
+			
+			$.ajax({
+				url:uri,
+				type:"DELETE",
+				headers:headers,
+				dataType:"json",
+				success:function(response){
+					if(response.result==false){
+						alert("댓글삭제에 실패했습니다");
+						return false;
+					}
+					
+					printCommentList();
+					$("#commentModal").modal("hide");
+					
+				},
+				error:function(xhr,status,error){
+					alert("에러가 발생!!");
+					return false;
+				}
+			});	
+		
+		}
 		
 		
 		//댓글 리스트

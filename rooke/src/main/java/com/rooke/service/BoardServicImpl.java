@@ -3,11 +3,16 @@ package com.rooke.service;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+import com.rooke.domain.PictureDTO;
 import com.rooke.domain.RookeDTO;
 import com.rooke.domain.SearchDto;
+import com.rooke.mapper.PictureMapper;
 import com.rooke.mapper.RookeMapper;
 import com.rooke.paging.Pagination;
 import com.rooke.paging.PagingResponse;
+import util.FileUtils;
 
 @Service
 public class BoardServicImpl implements BoardService {
@@ -15,6 +20,12 @@ public class BoardServicImpl implements BoardService {
 
   @Autowired
   private RookeMapper rookeMapper;
+
+  @Autowired
+  private PictureMapper pictureMapper;
+
+  @Autowired
+  private FileUtils fileUtils;
 
   @Override
   public boolean registerBoard(RookeDTO dto) {
@@ -28,6 +39,22 @@ public class BoardServicImpl implements BoardService {
 
 
     return (queryResult == 1) ? true : false;
+  }
+
+  @Override
+  public boolean registerBoard(RookeDTO dto, MultipartFile[] files) {
+    int queryResult = 1;
+    if (registerBoard(dto) == false) {
+      return false;
+    }
+    List<PictureDTO> fileList = fileUtils.uploadFiles(files, dto.getIdx());
+    if (CollectionUtils.isEmpty(fileList) == false) {
+      queryResult = pictureMapper.insertPicture(fileList);
+      if (queryResult < 1) {
+        queryResult = 0;
+      }
+    }
+    return (queryResult > 0);
   }
 
   @Override

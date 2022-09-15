@@ -18,7 +18,7 @@
 		delete_time
 	</sql>
 	<!-- 새글 작성 -->
-	<insert id="insertBoard" parameterType="RookeDTO">
+	<insert id="insertBoard" parameterType="RookeDTO" useGeneratedKeys="true" keyProperty="idx">
 		insert into tb_board (<include refid="rookeColumns"></include>)
 		values (#{idx},#{title},#{content},#{writer},0,ifnull(#{noticeYn},'N'),ifnull(#{secretYn},'N'),'N',now(),null,null)
 	</insert>

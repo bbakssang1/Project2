@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rooke.mapper.PictureMapper">
+	
+	<sql id="pictureColumns">
+		idx,board_idx,real_name,save_name,size,delete_yn,insert_yn,delete_yn
+	</sql>
+	
+	<insert id="insertPicture" parameterType="list">
+		insert into tb_picture(<include refid="pictureColumns"></include>) values
+		<foreach collection="list" item="item" separator=",">
+		(#{item.idx},#{item.boardIdx},#{item.realName},#{item.saveName},#{item.size},'N',now(),null)
+		</foreach>
+	</insert>
+	
+	<select id="selectPictureDetail" parameterType="long" resultType="PictureDTO">
+		select <include refid="pictureColumns"></include>
+		from tb_picture
+		where delete_yn='N'
+		and idx=#{idx}
+	</select>
+	
+	<update id="deletePicture" parameterType="long">
+		update tb_picture
+		set delete_yn='Y',delete_time=now()
+		where board_idx=#{boardIdx}
+	</update>
+	
+	<select id="selectPictureList" parameterType="long" resultType="PictureDTO">
+		select <include refid="pictureColumns"></include>
+		from tb_picture
+		where delete_yn='N'
+		and board_idx=#{boardIdx}
+	</select>
+	
+	<select id="selectPictureTotalCount" parameterType="long" resultType="int">
+		select count(*)
+		from tb_picture
+		where delete_yn='N'
+		and board_idx=#{boardIdx}
+	</select>
+</mapper>

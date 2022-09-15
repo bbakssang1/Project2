@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,5 +65,21 @@ public class CommentController {
     return jObj;
   }
 
+  @DeleteMapping(value = "/comments/{idx}")
+  public JsonObject deleteComment(@PathVariable("idx") final Long idx) {
+    JsonObject jObj = new JsonObject();
+
+    try {
+      boolean isDeleted = commentService.deleteComment(idx);
+      jObj.addProperty("result", isDeleted);
+    } catch (DataAccessException e) {
+      jObj.addProperty("message", "데이터베이스 처리중 문제 발생!");
+    }
+
+    catch (Exception e) {
+      jObj.addProperty("message", "시스템에 문제 발생!");
+    }
+    return jObj;
+  }
 
 }
