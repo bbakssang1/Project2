@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import com.rooke.constant.Method;
 import com.rooke.domain.RookeDTO;
 import com.rooke.domain.SearchDto;
 import com.rooke.paging.PagingResponse;
 import com.rooke.service.BoardService;
-import constant.Method;
-import util.UiUtils;
+import com.rooke.util.UiUtils;
 
 @Controller
 public class BoardController extends UiUtils {
@@ -40,9 +41,10 @@ public class BoardController extends UiUtils {
   }
 
   @PostMapping(value = "/board/register.do")
-  public String registerBoard(final RookeDTO dto, Model model) {
+  public String registerBoard(final RookeDTO dto, MultipartFile[] files, Model model) {
+
     try {
-      boolean isRegistered = boardService.registerBoard(dto);
+      boolean isRegistered = boardService.registerBoard(dto, files);
       if (isRegistered == false) {
         return showMessageWithRedirect("게시글 등록에 실패했습니다", "/board/list.do", Method.GET, null, model);
       }

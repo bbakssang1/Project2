@@ -12,7 +12,7 @@ import com.rooke.mapper.PictureMapper;
 import com.rooke.mapper.RookeMapper;
 import com.rooke.paging.Pagination;
 import com.rooke.paging.PagingResponse;
-import util.FileUtils;
+import com.rooke.util.FileUtility;
 
 @Service
 public class BoardServicImpl implements BoardService {
@@ -21,11 +21,14 @@ public class BoardServicImpl implements BoardService {
   @Autowired
   private RookeMapper rookeMapper;
 
+
   @Autowired
   private PictureMapper pictureMapper;
 
+
   @Autowired
-  private FileUtils fileUtils;
+  private FileUtility fileUtility;
+
 
   @Override
   public boolean registerBoard(RookeDTO dto) {
@@ -41,13 +44,14 @@ public class BoardServicImpl implements BoardService {
     return (queryResult == 1) ? true : false;
   }
 
+
   @Override
   public boolean registerBoard(RookeDTO dto, MultipartFile[] files) {
     int queryResult = 1;
     if (registerBoard(dto) == false) {
       return false;
     }
-    List<PictureDTO> fileList = fileUtils.uploadFiles(files, dto.getIdx());
+    List<PictureDTO> fileList = fileUtility.uploadFiles(files, dto.getIdx());
     if (CollectionUtils.isEmpty(fileList) == false) {
       queryResult = pictureMapper.insertPicture(fileList);
       if (queryResult < 1) {
@@ -56,6 +60,7 @@ public class BoardServicImpl implements BoardService {
     }
     return (queryResult > 0);
   }
+
 
   @Override
   public RookeDTO getBoardDetail(Long idx) {

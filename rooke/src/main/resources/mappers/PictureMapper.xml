@@ -4,7 +4,7 @@
 <mapper namespace="com.rooke.mapper.PictureMapper">
 	
 	<sql id="pictureColumns">
-		idx,board_idx,real_name,save_name,size,delete_yn,insert_yn,delete_yn
+		idx,board_idx,real_name,save_name,size,delete_yn,insert_time,delete_time
 	</sql>
 	
 	<insert id="insertPicture" parameterType="list">

@@ -1,10 +1,10 @@
-package util;
+package com.rooke.util;
 
 import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
-import constant.Method;
+import com.rooke.constant.Method;
 
 @Controller
 public class UiUtils {
