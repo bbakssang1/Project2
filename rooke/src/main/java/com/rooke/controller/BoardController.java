@@ -1,5 +1,6 @@
 package com.rooke.controller;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.rooke.constant.Method;
+import com.rooke.domain.PictureDTO;
 import com.rooke.domain.RookeDTO;
 import com.rooke.domain.SearchDto;
 import com.rooke.paging.PagingResponse;
@@ -23,8 +25,8 @@ public class BoardController extends UiUtils {
   private BoardService boardService;
 
   @GetMapping(value = "/board/write.do")
-  public String openBoardWrite(@RequestParam(value = "idx", required = false) Long idx,
-      Model model) {
+  public String openBoardWrite(@ModelAttribute RookeDTO dto,
+      @RequestParam(value = "idx", required = false) Long idx, Model model) {
     if (idx == null) {
       model.addAttribute("rooke", new RookeDTO());
     } else {
@@ -33,6 +35,9 @@ public class BoardController extends UiUtils {
         return "redirect:/board/list.do";
       }
       model.addAttribute("rooke", rooke);
+
+      List<PictureDTO> fileList = boardService.getPictureFileList(idx);
+      model.addAttribute("fileList", fileList);
 
     }
 

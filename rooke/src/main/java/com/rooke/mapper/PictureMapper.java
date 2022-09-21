@@ -16,4 +16,6 @@ public interface PictureMapper {
   public List<PictureDTO> selectPictureList(Long boardIdx);
 
   public int selectPictureTotalCount(Long boardIdx);
+
+  public int undeletePicture(List<Long> idxs);
 }

@@ -40,4 +40,14 @@
 		where delete_yn='N'
 		and board_idx=#{boardIdx}
 	</select>
+	
+	<update id="undeletePicture" parameterType="list">
+		update tb_picture
+		set delete_yn='N'
+		where idx in
+		<foreach collection="list" item="item" separator="," open="(" close=")" >
+			#{item}
+		</foreach>
+		
+	</update>
 </mapper>

@@ -1,5 +1,6 @@
 package com.rooke.service;
 
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,10 +39,21 @@ public class BoardServicImpl implements BoardService {
       queryResult = rookeMapper.insertBoard(dto);
     } else {
       queryResult = rookeMapper.updateBoard(dto);
+      // 파일이 추가,삭제,수정 된 경우
+      if ("Y".equals(dto.getChangeYn())) {
+        pictureMapper.deletePicture(dto.getIdx());
+
+        // fileIdxs에 포함된 idx를 가지는 파일의 삭제여부를 'N'으로 업데이트
+        if (CollectionUtils.isEmpty(dto.getFileIdxs()) == false) {
+          pictureMapper.undeletePicture(dto.getFileIdxs());
+        }
+      }
     }
 
 
-    return (queryResult == 1) ? true : false;
+
+    // return (queryResult == 1) ? true : false;
+    return (queryResult > 0);
   }
 
 
@@ -87,6 +99,15 @@ public class BoardServicImpl implements BoardService {
     List<RookeDTO> list = rookeMapper.selectBoardList(search);
     return new PagingResponse<>(list, pagination);
 
+  }
+
+  @Override
+  public List<PictureDTO> getPictureFileList(Long boadIdx) {
+    int fileTotalCount = pictureMapper.selectPictureTotalCount(boadIdx);
+    if (fileTotalCount < 1) {
+      return Collections.emptyList();
+    }
+    return pictureMapper.selectPictureList(boadIdx);
   }
   // @Override
   // public List<RookeDTO> getBoardList(final SearchDto search) {

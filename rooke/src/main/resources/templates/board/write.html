@@ -9,6 +9,9 @@
 			<form class="form-horizontal" th:action="@{/board/register.do}" th:object="${rooke}" method="post" onsubmit="return registerBoard(this)" enctype="multipart/form-data">
 				<!--/* update의 경우 서버로 전달할 게시글 번호 (PK) */-->
 				<input type="hidden" th:if="*{idx != null and idx > 0}" th:field="*{idx}" />
+				
+				<!-- 파일이 변경된 경우 해당 파라미터를 이용해 파일 삭제 및 등록 처리 -->
+				<input type="hidden" th:field=*{changeYn} value="N"></input>
 				<!--  
 				<div class="form-group">
 					<label for="noticeYn" class="col-sm-2 control-label">공지글 설정</label>
@@ -45,9 +48,11 @@
 						<textarea th:field="*{content}" class="form-control" placeholder="내용을 입력해 주세요."></textarea>
 					</div>
 				</div>
-
-				<div data-name="fileDiv" class="form-group filebox bs3-primary">
-					<label for="file_0" class="col-sm-2 control-label">파일</label>
+				
+				<!-- 파일 구역 -->
+				<!-- 저장된 파일이 없는 파일 구역 -->
+				<div th:if="${#lists.isEmpty(fileList)}" data-name="fileDiv" class="form-group filebox bs3-primary">
+					<label for="file_0" class="col-sm-2 control-label">파일 1</label>
 					<div class="col-sm-10">
 						<input type="text" class="upload-name" value="파일 탐색" readonly="readonly">
 						<label for="file_0" class="control-label">찾아보기</label>
@@ -55,6 +60,24 @@
 						
 					
 					<button type="button" onclick="addFile()" class="btn btn-bordered btn-xs visible-xs-inline visible-sm-inline visible-md-inline visible-lg-inline">
+						<i class="fa fa-plus" aria-hidden="true"></i>
+					</button>
+					<button type="button" onclick="removeFile(this)" class="btn btn-bordered btn-xs visible-xs-inline visible-sm-inline visible-md-inline visible-lg-inline">
+						<i class="fa fa-minus" aria-hidden="true"></i>
+					</button>
+					</div>
+				</div>
+				<!-- 저장된 파일이 있는 파일 구역 -->
+				<div th:unless="${#lists.isEmpty(fileList)}" th:each="row,status:${fileList}" data-name="fileDiv" class="form-group filebox bs3-primary">
+					<label th:for="|file_${status.index}|" class="col-sm-2 control-label">[[ |파일 ${status.count}| ]]</label>
+					<div class="col-sm-10">
+						<input type="hidden" name="fileIdxs" th:value="${row.idx}">
+						<input type="text" class="upload-name" th:value="${row.realName}" readonly="readonly">
+						<label th:for="|file_${status.index}|" class="control-label">찾아보기</label>
+						<input type="file" name="files" th:id="|file_${status.index}|" class="upload_hidden" onchange="changeFilename(this)">
+						
+					
+					<button th:if="${status.first}" type="button" onclick="addFile()" class="btn btn-bordered btn-xs visible-xs-inline visible-sm-inline visible-md-inline visible-lg-inline">
 						<i class="fa fa-plus" aria-hidden="true"></i>
 					</button>
 					<button type="button" onclick="removeFile(this)" class="btn btn-bordered btn-xs visible-xs-inline visible-sm-inline visible-md-inline visible-lg-inline">
@@ -74,7 +97,7 @@
 	<th:block layout:fragment="script">
 		<script th:inline="javascript">
 			
-
+		
 			function registerBoard(form) {
 
 				form.noticeYn.value = form.noticeYn.checked == false ? 'N' : 'Y';
@@ -92,7 +115,8 @@
 			}
 			
 			/*파일 인덱스 처리용 전역 변수*/
-			let fileIdx=0;
+			const fileList=[[${fileList}]];
+			let fileIdx=isEmpty(fileList)? 0: fileList.length;
 			
 			function addFile(){
 				const fileDivs=$('div[data-name="fileDiv"]');
@@ -101,9 +125,10 @@
 					return false;
 					
 				}
+				document.getElementById('changeYn').value='Y';
 				
 				fileIdx++;
-				console.log(fileIdx);
+				//console.log(fileIdx);
 				
 				const fileHtml=`
 					<div data-name="fileDiv" class="form-group filebox bs3-primary">
@@ -126,6 +151,8 @@
 			}
 			
 			function removeFile(elem){
+				
+				document.getElementById('changeYn').value='Y';
 				const prevTag=$(elem).prev().prop('tagName');
 				/*
 				console.log(elem);
@@ -136,6 +163,8 @@
 					const fileName=$(elem).prevAll('input[type="text"]');
 					file.val('');
 					fileName.val('파일 탐색');
+					
+					$(elem).prevAll('input[name=fileIdxs]').remove();
 					return false;
 				}
 				const target=$(elem).parents('div[data-name="fileDiv"]');
@@ -143,11 +172,14 @@
 			}
 			
 			function changeFilename(file){
+				document.getElementById('changeYn').value='Y';
 				file=$(file);
-				console.log(file);
+				//console.log(file);
 				const filename=file[0].files[0].name;
-				const target=file.prevAll('input');
+				const target=file.prevAll('input.upload-name');
 				target.val(filename);
+				
+				file.prevAll('input[name="fileIdxs"]').remove();
 			}
 			
 			
