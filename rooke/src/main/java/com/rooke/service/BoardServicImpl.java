@@ -109,6 +109,11 @@ public class BoardServicImpl implements BoardService {
     }
     return pictureMapper.selectPictureList(boadIdx);
   }
+
+  @Override
+  public PictureDTO getPictureDetail(Long idx) {
+    return pictureMapper.selectPictureDetail(idx);
+  }
   // @Override
   // public List<RookeDTO> getBoardList(final SearchDto search) {
   // List<RookeDTO> boardList = Collections.emptyList();

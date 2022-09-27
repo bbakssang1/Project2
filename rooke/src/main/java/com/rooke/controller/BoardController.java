@@ -1,7 +1,14 @@
 package com.rooke.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
@@ -75,17 +82,23 @@ public class BoardController extends UiUtils {
 
   @GetMapping(value = "/board/view.do")
   public String openBoardDetail(@RequestParam(value = "idx", required = false) Long idx,
-      Model model) {
+      Model model, @ModelAttribute("dto") RookeDTO dto) {
     if (idx == null) {
-      // todo=>잘못된 접근 메시지, 다시 게시글 리스트로
-      return "redirect:/board/list.do";
+      return showMessageWithRedirect("잘못된 접근입니다", "/board/list.do", Method.GET, null, model);
+      // return "redirect:/board/list.do";
     }
     RookeDTO rooke = boardService.getBoardDetail(idx);
     if (rooke == null || "Y".equals(rooke.getDeleteYn())) {
-      // todo 존재치 않는 게시글이나 이미 삭제된 게시글이면 다시 게시글 리스트로
-      return "redirect:/board/list.do";
+
+      // return "redirect:/board/list.do";
+      return showMessageWithRedirect("게시글이 없거나 이미 삭제된 글입니다", "/board/list.do", Method.GET, null,
+          model);
     }
     model.addAttribute("rooke", rooke);
+
+    List<PictureDTO> fileList = boardService.getPictureFileList(idx);
+    model.addAttribute("fileList", fileList);
+
     return "board/view";
 
   }
@@ -110,5 +123,40 @@ public class BoardController extends UiUtils {
     }
     return showMessageWithRedirect("게시글이 삭제됐습니다!", "/board/list.do", Method.GET, queryParams,
         model);
+  }
+
+
+  @GetMapping("/board/download.do")
+  public void downloadPictureFile(@RequestParam(value = "idx", required = false) final Long idx,
+      Model model, HttpServletResponse response) {
+    if (idx == null)
+      throw new RuntimeException("잘못된 접근입니다");
+    PictureDTO fileInfo = boardService.getPictureDetail(idx);
+    if (fileInfo == null || "Y".equals(fileInfo.getDeleteYn())) {
+      throw new RuntimeException("파일 정보를 찾을수 없습니다");
+    }
+
+    String uploadDate = fileInfo.getInsertTime().format(DateTimeFormatter.ofPattern("yyMMdd"));
+    String uploadPath = Paths.get("C:", "bitjava", "upload", uploadDate).toString();
+    String filename = fileInfo.getRealName();
+    File file = new File(uploadPath, fileInfo.getSaveName());
+
+    try {
+      byte[] data = FileUtils.readFileToByteArray(file);
+      response.setContentType("application/octet-stream");
+      response.setContentLength(data.length);
+      response.setHeader("Content-Transfer-Encoding", "binary");
+      response.setHeader("Content-Disposition",
+          "attachment; fileName=\"" + URLEncoder.encode(filename, "UTF-8") + "\";");
+      response.getOutputStream().write(data);
+      response.getOutputStream().flush();
+      response.getOutputStream().close();
+    } catch (IOException e) {
+      throw new RuntimeException("파일다운로드에 실패했습니다");
+
+    } catch (Exception e) {
+
+      throw new RuntimeException("시스템에 문제가 발생했습니다");
+    }
   }
 }

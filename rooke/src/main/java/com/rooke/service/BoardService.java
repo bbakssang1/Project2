@@ -20,4 +20,6 @@ public interface BoardService {
   public PagingResponse<RookeDTO> getBoardList(SearchDto search);
 
   public List<PictureDTO> getPictureFileList(Long boardIdx);
+
+  public PictureDTO getPictureDetail(Long idx);
 }
